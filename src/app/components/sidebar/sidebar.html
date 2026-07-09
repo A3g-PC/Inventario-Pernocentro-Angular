@@ -1,0 +1,78 @@
+<aside class="sidebar">
+
+  <div class="brand">
+
+    <img
+      class="brand-logo"
+      src="/assets/Pernocentro.png"
+      alt="Pernocentro"
+    >
+
+    <div class="brand-text">
+      <h2>Pernocentro</h2>
+
+      @if (usuarioActual) {
+        <p>{{ usuarioActual.rol }}</p>
+      } @else {
+        <p>Inventario</p>
+      }
+    </div>
+
+  </div>
+
+  <nav class="nav-menu">
+
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="active"
+      class="nav-link">
+      Panel principal
+    </a>
+
+    <a
+      routerLink="/inventario"
+      routerLinkActive="active"
+      class="nav-link">
+      Inventario
+    </a>
+
+    <a
+      routerLink="/movimientos"
+      routerLinkActive="active"
+      class="nav-link">
+      Movimientos
+    </a>
+
+    @if (esAdministrador()) {
+      <a
+        routerLink="/proveedores"
+        routerLinkActive="active"
+        class="nav-link">
+        Proveedores
+      </a>
+
+      <a
+        routerLink="/usuarios"
+        routerLinkActive="active"
+        class="nav-link">
+        Usuarios
+      </a>
+    }
+
+    <a
+      routerLink="/historial"
+      routerLinkActive="active"
+      class="nav-link">
+      Historial
+    </a>
+
+  </nav>
+
+  <button
+    class="logout"
+    type="button"
+    (click)="cerrarSesion()">
+    Cerrar sesión
+  </button>
+
+</aside>

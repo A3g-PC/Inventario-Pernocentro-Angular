@@ -1,0 +1,89 @@
+<div class="app">
+  <app-sidebar></app-sidebar>
+
+  <main class="content">
+    <section class="section">
+      <div class="top">
+        <div>
+          <h1>Panel principal</h1>
+
+          @if (usuarioActual) {
+            <p class="usuario-info">
+              Usuario: {{ usuarioActual.nombre }} | Rol: {{ usuarioActual.rol }}
+            </p>
+          }
+        </div>
+      </div>
+
+      @if (cargando) {
+        <p>Cargando información del inventario...</p>
+      } @else if (mensajeError) {
+        <p class="error">{{ mensajeError }}</p>
+      } @else {
+        <div class="cards">
+          <div class="card">
+            <h3>{{ obtenerTotalProductos() }}</h3>
+            <p>Productos registrados</p>
+          </div>
+
+          <div class="card">
+            <h3>{{ obtenerTotalUnidades() }}</h3>
+            <p>Unidades disponibles</p>
+          </div>
+
+          <div class="card warning">
+            <h3>{{ obtenerProductosBajoStock().length }}</h3>
+            <p>Productos con bajo stock</p>
+          </div>
+
+          <div class="card danger">
+            <h3>{{ obtenerProductosCriticos().length }}</h3>
+            <p>Productos críticos</p>
+          </div>
+        </div>
+
+        <h2>Productos que requieren reposición</h2>
+
+        @if (obtenerProductosBajoStock().length === 0) {
+          <p>No existen productos que requieran reposición.</p>
+        } @else {
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Cantidad</th>
+                <th>Stock mínimo</th>
+                <th>Prioridad</th>
+                <th>Reposición sugerida</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (producto of obtenerProductosBajoStock(); track producto.id) {
+                <tr>
+                  <td>{{ producto.nombre }}</td>
+                  <td>{{ producto.categoria }}</td>
+                  <td>{{ producto.cantidad }}</td>
+                  <td>{{ producto.stockMinimo }}</td>
+                  <td>
+                    @if (producto.obtenerPrioridad() === 'Crítica') {
+                      <span class="prioridad-critica">Crítica</span>
+                    } @else if (producto.obtenerPrioridad() === 'Alta') {
+                      <span class="prioridad-alta">Alta</span>
+                    } @else if (producto.obtenerPrioridad() === 'Media') {
+                      <span class="prioridad-media">Media</span>
+                    } @else {
+                      <span class="prioridad-sin-alerta">Sin alerta</span>
+                    }
+                  </td>
+                  <td>{{ producto.calcularReposicionSugerida() }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+    </section>
+  </main>
+</div>

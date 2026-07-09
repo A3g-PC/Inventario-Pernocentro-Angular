@@ -1,0 +1,124 @@
+<div class="app">
+  <app-sidebar></app-sidebar>
+
+  <main class="content">
+    <section class="section">
+      <div class="top">
+        <div>
+          <h1>Usuarios</h1>
+          <p class="usuario-info">
+            Administración de perfiles y estados registrados en Firestore.
+          </p>
+        </div>
+      </div>
+
+      <p class="info">
+        Las contraseñas no se almacenan en Firestore. La autenticación se gestiona mediante Firebase Authentication.
+      </p>
+
+      @if (mensajeError) {
+        <p class="error">{{ mensajeError }}</p>
+      }
+
+      @if (mensajeExito) {
+        <p class="success">{{ mensajeExito }}</p>
+      }
+
+      @if (usuarioEditando) {
+        <h2>Editar usuario</h2>
+
+        <div class="form-grid">
+          <div>
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="nombreEditado">
+          </div>
+
+          <div>
+            <label>Email</label>
+            <input type="text" [value]="usuarioEditando.email" disabled>
+          </div>
+
+          <div>
+            <label>Rol</label>
+            <input type="text" [value]="usuarioEditando.rol" disabled>
+          </div>
+
+          <div>
+            <label>Estado</label>
+
+            @if (usuarioEditando.esAdministrador()) {
+              <input type="text" value="Activo" disabled>
+            } @else {
+              <select [(ngModel)]="activoEditado">
+                <option [ngValue]="true">Activo</option>
+                <option [ngValue]="false">Inactivo</option>
+              </select>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary" (click)="guardarCambiosUsuario()">
+            Guardar cambios
+          </button>
+
+          <button (click)="cancelarEdicion()">
+            Cancelar
+          </button>
+        </div>
+      }
+
+      <h2 class="table-title">Usuarios registrados</h2>
+
+      @if (cargando) {
+        <p>Cargando usuarios...</p>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (usuario of usuarios; track usuario.uid) {
+                <tr>
+                  <td>{{ usuario.nombre }}</td>
+                  <td>{{ usuario.email }}</td>
+                  <td>{{ usuario.rol }}</td>
+                  <td>
+                    @if (usuario.activo) {
+                      <span class="estado-ok">Activo</span>
+                    } @else {
+                      <span class="estado-agotado">Inactivo</span>
+                    }
+                  </td>
+                  <td>{{ usuario.obtenerDescripcionRol() }}</td>
+                  <td>
+                    <button (click)="editarUsuario(usuario)">Editar</button>
+
+                    @if (usuario.esAdministrador()) {
+                      <button disabled>Protegido</button>
+                    } @else {
+                      <button
+                        class="danger-btn"
+                        (click)="cambiarEstado(usuario)">
+                        {{ usuario.activo ? 'Desactivar' : 'Activar' }}
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </main>
+</div>

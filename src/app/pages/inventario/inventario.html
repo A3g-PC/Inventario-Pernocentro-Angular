@@ -1,0 +1,176 @@
+<div class="app">
+  <app-sidebar></app-sidebar>
+
+  <main class="content">
+    <section class="section">
+
+      @if (!mostrandoFormulario) {
+        <div class="top">
+          <div>
+            <h1>Inventario general</h1>
+            <p class="usuario-info">Consulta, filtrado y gestión de productos registrados.</p>
+          </div>
+
+          @if (authService.tienePermiso('crearProducto')) {
+            <button class="primary" (click)="mostrarFormularioAgregar()">
+              Agregar producto
+            </button>
+          }
+        </div>
+
+        @if (mensajeError) {
+          <p class="error">{{ mensajeError }}</p>
+        }
+
+        @if (mensajeExito) {
+          <p class="success">{{ mensajeExito }}</p>
+        }
+
+        <div class="filters">
+          <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtroNombre">
+
+          <select [(ngModel)]="filtroCategoria">
+            <option value="">Todas las categorías</option>
+            @for (categoria of obtenerCategorias(); track categoria) {
+              <option [value]="categoria">{{ categoria }}</option>
+            }
+          </select>
+
+          <select [(ngModel)]="filtroPrioridad">
+            <option value="">Todas las prioridades</option>
+            <option value="Crítica">Crítica</option>
+            <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Sin alerta">Sin alerta</option>
+          </select>
+        </div>
+
+        <h2 class="table-title">Productos registrados</h2>
+
+        @if (cargando) {
+          <p>Cargando inventario...</p>
+        } @else if (obtenerProductosFiltrados().length === 0) {
+          <p class="info">No hay productos que coincidan con los filtros seleccionados.</p>
+        } @else {
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Cantidad</th>
+                  <th>Stock mínimo</th>
+                  <th>Proveedor</th>
+                  <th>Estado</th>
+                  <th>Prioridad</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (producto of obtenerProductosFiltrados(); track producto.id) {
+                  <tr>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td>{{ producto.stockMinimo }}</td>
+                    <td>{{ obtenerNombreProveedor(producto.proveedorId) }}</td>
+
+                    <td>
+                      @if (producto.obtenerEstado() === 'Disponible') {
+                        <span class="estado-ok">Disponible</span>
+                      } @else if (producto.obtenerEstado() === 'Bajo stock') {
+                        <span class="estado-bajo">Bajo stock</span>
+                      } @else {
+                        <span class="estado-agotado">Agotado</span>
+                      }
+                    </td>
+
+                    <td>
+                      @if (producto.obtenerPrioridad() === 'Crítica') {
+                        <span class="prioridad-critica">Crítica</span>
+                      } @else if (producto.obtenerPrioridad() === 'Alta') {
+                        <span class="prioridad-alta">Alta</span>
+                      } @else if (producto.obtenerPrioridad() === 'Media') {
+                        <span class="prioridad-media">Media</span>
+                      } @else {
+                        <span class="prioridad-sin-alerta">Sin alerta</span>
+                      }
+                    </td>
+
+                    <td>
+                      @if (authService.tienePermiso('editarProducto')) {
+                        <button (click)="seleccionarProducto(producto)">Editar</button>
+                      }
+
+                      @if (authService.tienePermiso('eliminarProducto')) {
+                        <button class="danger-btn" (click)="eliminarProducto(producto)">Eliminar</button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+
+      @if (mostrandoFormulario) {
+        <div class="top">
+          <div>
+            <h1>{{ productoEditando ? 'Editar producto' : 'Agregar producto' }}</h1>
+            <p class="usuario-info">
+              Complete la información del producto para registrarlo en el inventario.
+            </p>
+          </div>
+        </div>
+
+        @if (mensajeError) {
+          <p class="error">{{ mensajeError }}</p>
+        }
+
+        <div class="form-grid">
+          <div>
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="nombre">
+          </div>
+
+          <div>
+            <label>Categoría</label>
+            <input type="text" [(ngModel)]="categoria">
+          </div>
+
+          <div>
+            <label>Cantidad disponible</label>
+            <input type="number" [(ngModel)]="cantidad">
+          </div>
+
+          <div>
+            <label>Stock mínimo</label>
+            <input type="number" [(ngModel)]="stockMinimo">
+          </div>
+
+          <div>
+            <label>Proveedor</label>
+            <select [(ngModel)]="proveedorId">
+              <option value="">Sin proveedor</option>
+
+              @for (proveedor of obtenerProveedoresActivos(); track proveedor.id) {
+                <option [value]="proveedor.id">{{ proveedor.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary" (click)="guardarProducto()">
+            {{ productoEditando ? 'Actualizar producto' : 'Guardar producto' }}
+          </button>
+
+          <button (click)="cancelarFormulario()">Cancelar</button>
+        </div>
+      }
+
+    </section>
+  </main>
+</div>

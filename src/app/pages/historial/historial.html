@@ -1,0 +1,52 @@
+<div class="app">
+  <app-sidebar></app-sidebar>
+
+  <main class="content">
+    <section class="section">
+      <div class="top">
+        <div>
+          <h1>Historial</h1>
+          <p class="usuario-info">
+            Auditoría general de acciones realizadas en el sistema.
+          </p>
+        </div>
+      </div>
+
+      @if (mensajeError) {
+        <p class="error">{{ mensajeError }}</p>
+      }
+
+      @if (cargando) {
+        <p>Cargando historial...</p>
+      } @else if (registros.length === 0) {
+        <p class="info">Todavía no existen acciones registradas en el historial.</p>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (registro of registros; track registro.id) {
+                <tr>
+                  <td>{{ formatearFecha(registro.fecha) }}</td>
+                  <td>{{ registro.tipo }}</td>
+                  <td>{{ registro.descripcion }}</td>
+                  <td>{{ registro.usuarioNombre }}</td>
+                  <td>{{ registro.rolUsuario }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </main>
+</div>

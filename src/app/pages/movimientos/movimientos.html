@@ -1,0 +1,127 @@
+<div class="app">
+  <app-sidebar></app-sidebar>
+
+  <main class="content">
+    <section class="section">
+      <div class="top">
+        <div>
+          <h1>Movimientos</h1>
+          <p class="usuario-info">
+            Registro de entradas, salidas y ajustes de inventario.
+          </p>
+        </div>
+      </div>
+
+      @if (mensajeError) {
+        <p class="error">{{ mensajeError }}</p>
+      }
+
+      @if (mensajeExito) {
+        <p class="success">{{ mensajeExito }}</p>
+      }
+
+      <h2>Registrar movimiento</h2>
+
+      <div class="form-grid">
+        <div>
+          <label>Producto</label>
+          <select [(ngModel)]="productoId">
+            <option value="">Seleccione un producto</option>
+
+            @for (producto of productos; track producto.id) {
+              <option [value]="producto.id">
+                {{ producto.nombre }} | Stock actual: {{ producto.cantidad }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label>Tipo de movimiento</label>
+          <select [(ngModel)]="tipoMovimiento">
+            <option value="entrada">Entrada</option>
+            <option value="salida">Salida</option>
+            <option value="ajuste">Ajuste</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Cantidad</label>
+          <input
+            type="number"
+            min="1"
+            [(ngModel)]="cantidad"
+          >
+        </div>
+
+        <div>
+          <label>Motivo</label>
+          <textarea
+            placeholder="Ejemplo: Venta realizada, compra a proveedor o corrección de inventario"
+            [(ngModel)]="motivo">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          class="primary"
+          type="button"
+          (click)="registrarMovimiento()"
+          [disabled]="guardando">
+          {{ guardando ? 'Registrando...' : 'Registrar movimiento' }}
+        </button>
+
+        <button
+          type="button"
+          (click)="limpiarFormulario()">
+          Limpiar
+        </button>
+      </div>
+
+      <h2 class="table-title">Últimos movimientos</h2>
+
+      @if (cargando) {
+        <p>Cargando movimientos...</p>
+      } @else if (movimientos.length === 0) {
+        <p class="info">Todavía no existen movimientos registrados.</p>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+                <th>Stock anterior</th>
+                <th>Stock nuevo</th>
+                <th>Usuario</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (movimiento of movimientos; track movimiento.id) {
+                <tr>
+                  <td>{{ formatearFecha(movimiento.fecha) }}</td>
+                  <td>{{ movimiento.productoNombre }}</td>
+                  <td>
+                    <span [class]="obtenerClaseTipo(movimiento.tipo)">
+                      {{ formatearTipo(movimiento.tipo) }}
+                    </span>
+                  </td>
+                  <td>{{ movimiento.cantidad }}</td>
+                  <td>{{ movimiento.stockAnterior }}</td>
+                  <td>{{ movimiento.stockNuevo }}</td>
+                  <td>{{ movimiento.usuarioNombre }}</td>
+                  <td>{{ movimiento.motivo }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </main>
+</div>
